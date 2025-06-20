@@ -50,11 +50,21 @@ class AuthController extends Controller
 
         return response()
             ->json([
-                'message' => 'Hi '.$user->name,
+                'message' => 'Hola! '.$user->name,
                 'accesToken' => $token,
                 'token_type' => 'Bearer',
                 'user' =>$user,
             ]);
     }
+
+    public function logout()
+    {
+        auth()->user()->tokens()->delete();
+
+        return [
+            'message' => 'Haz cerrado sesión correctamente y el token ha sido eliminado.'
+        ];
+    }
+
 
 }
