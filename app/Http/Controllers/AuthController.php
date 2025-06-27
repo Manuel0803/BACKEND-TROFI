@@ -22,8 +22,9 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'telefono' => 'required|string|min:10'
+            'phoneNumber' => 'required|string|max:10'
         ]);
+
 
         if($validator->fails()){
         return response()->json($validator->errors());
@@ -33,13 +34,13 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'telefono' => $request->telefono
+            'phoneNumber' => $request->phoneNumber
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()
-            ->json(['data' => $user,'acces_token' => $token, 'token_type' => 'Bearer',]);
+            ->json(['data' => $user,'access_token' => $token, 'token_type' => 'Bearer',]);
     }
 
     public function login(Request $request)
@@ -57,7 +58,7 @@ class AuthController extends Controller
         return response()
             ->json([
                 'message' => 'Hola! '.$user->name,
-                'accesToken' => $token,
+                'access_token' => $token,
                 'token_type' => 'Bearer',
                 'user' =>$user,
             ]);
