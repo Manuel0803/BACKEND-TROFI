@@ -17,6 +17,16 @@ class User extends Authenticatable
         return $this->belongsTo(Trabajo::class, 'id_job');
     }
 
+    public function reviewsGiven()
+{
+    return $this->hasMany(Review::class, 'reviewer_id');
+}
+
+public function reviewsReceived()
+{
+    return $this->hasMany(Review::class, 'reviewed_id');
+}
+
     protected $fillable = [
         'name',
         'email',
@@ -43,4 +53,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+
 }
