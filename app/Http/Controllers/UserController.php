@@ -44,7 +44,6 @@ class UserController extends Controller
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
-        // Ensure $user is an Eloquent model instance
         if ($user && !$user instanceof \App\Models\User) {
             $user = \App\Models\User::find($user->id);
         }
@@ -112,7 +111,6 @@ class UserController extends Controller
 
     $images = $user->job_images ?? [];
 
-    // Simular un ID único para la nueva imagen
     $nextId = count($images) > 0
         ? max(array_column($images, 'id')) + 1
         : 1;
@@ -208,7 +206,6 @@ public function updateProfilePic(Request $request)
 public function updateProfileWorker(Request $request)
     {
         $user = Auth::user();
-        // Ensure $user is an Eloquent model instance
         if ($user && !$user instanceof \App\Models\User) {
             $user = \App\Models\User::find($user->id);
         }
@@ -383,4 +380,3 @@ public function updateJobDescription(Request $request)
 }
 
 }
-//endpoint para actualizar todos los datos del usuario nombre-userDescription-JobDescription-DNI-telefono

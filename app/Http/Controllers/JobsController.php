@@ -16,12 +16,10 @@ class JobsController extends Controller
 
     public function create()
     {
-        //
     }
 
     public function store(Request $request)
     {
-
     }
 
     public function show(Trabajo $trabajos)
@@ -31,16 +29,13 @@ class JobsController extends Controller
 
     public function edit(Trabajo $trabajos)
     {
-
     }
 
     public function update(Request $request, Trabajo $trabajos)
     {
-
     }
 
     public function destroy(Trabajo $trabajos)
     {
-
     }
 }
