@@ -26,8 +26,8 @@ return new class extends Migration
             $table->string('job_description')->nullable();
             $table->json('job_images')->nullable();
             $table->float('score')->default(0);
-            $table->timestamps();
             $table->rememberToken();
+            $table->timestamps();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

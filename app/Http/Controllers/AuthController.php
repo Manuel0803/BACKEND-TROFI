@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use \stdClass;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -69,5 +73,56 @@ class AuthController extends Controller
         ];
     }
 
+
+    public function sendPasswordResetEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email|exists:users,email']);
+
+        $token = Str::random(64);
+
+        DB::table('password_resets')->updateOrInsert(
+            ['email' => $request->email],
+            ['token' => $token, 'created_at' => Carbon::now()]
+        );
+
+        $resetLink = "myapp://reset-password?token={$token}&email={$request->email}";
+
+        Mail::raw("Reestablecé tu contraseña con este link: $resetLink", function ($message) use ($request) {
+            $message->to($request->email)
+                    ->subject('Recuperar contraseña');
+        });
+
+        return response()->json(['message' => 'Te enviamos un email con el enlace para reestablecer tu contraseña.']);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'token' => 'required',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $resetRecord = DB::table('password_resets')
+            ->where('email', $request->email)
+            ->where('token', $request->token)
+            ->first();
+
+        if (!$resetRecord || Carbon::parse($resetRecord->created_at)->addMinutes(60)->isPast()) {
+            return response()->json(['message' => 'Token inválido o expirado.'], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        // eliminamos el token usado
+        DB::table('password_resets')->where('email', $request->email)->delete();
+
+        return response()->json(['message' => 'Contraseña actualizada correctamente.']);
+    }
+
+
+    
 
 }
