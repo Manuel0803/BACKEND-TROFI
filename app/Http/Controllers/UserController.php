@@ -12,36 +12,38 @@ class UserController extends Controller
 {
     //Funcion que devuelve los datos de los usuarios registrados mediante su EMAIL
     public function getUserProfile($email)
-    {
-        $user = User::where('email', $email)->first();
+{
+    $user = User::where('email', $email)->first();
 
-        if (!$user) {
-            return response()->json(['message' => 'Usuario no encontrado'], 404);
-        }
-
-        return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'phoneNumber' => $user->phoneNumber,
-            'userDescription' => $user->userDescription,
-            'imageProfile' => $user->imageProfile,
-            'dni' => $user->dni,
-            'location' => $user->location,
-            'is_worker' => $user->is_worker,
-            'id_job' => $user->id_job,
-            'job_description' => $user->job_description,
-            'job_images' => $user->job_images,
-            'score' => $user->score,
-            'created_at' => $user->created_at,
-            'updated_at' => $user->updated_at,
-        ]);
+    if (!$user) {
+        return response()->json(['message' => 'Usuario no encontrado'], 404);
     }
+
+    // Obtener promedio de reseñas recibidas
+    $averageScore = $user->reviewsReceived()->avg('score');
+
+    return response()->json([
+        'id' => $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+        'phoneNumber' => $user->phoneNumber,
+        'userDescription' => $user->userDescription,
+        'imageProfile' => $user->imageProfile,
+        'dni' => $user->dni,
+        'location' => $user->location,
+        'is_worker' => $user->is_worker,
+        'id_job' => $user->id_job,
+        'job_description' => $user->job_description,
+        'job_images' => $user->job_images,
+        'score' => round($averageScore, 2),
+        'created_at' => $user->created_at,
+        'updated_at' => $user->updated_at,
+    ]);
+}
 
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
-        // Ensure $user is an Eloquent model instance
         if ($user && !$user instanceof \App\Models\User) {
             $user = \App\Models\User::find($user->id);
         }
@@ -213,7 +215,6 @@ public function updateProfilePic(Request $request)
 public function updateProfileWorker(Request $request)
     {
         $user = Auth::user();
-        // Ensure $user is an Eloquent model instance
         if ($user && !$user instanceof \App\Models\User) {
             $user = \App\Models\User::find($user->id);
         }
@@ -271,5 +272,120 @@ public function updateProfileWorker(Request $request)
             ]
         ], 200);
     }
+
+    public function getAllWorkers()
+{
+    $workers = \App\Models\User::where('is_worker', true)->get();
+
+    return response()->json([
+        'success' => true,
+        'workers' => $workers
+    ]);
+}
+
+public function updateName(Request $request)
+{
+    $user = Auth::user();
+    if ($user && !$user instanceof \App\Models\User) {
+        $user = \App\Models\User::find($user->id);
+    }
+
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|string|max:255',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'Nombre inválido.',
+            'errors' => $validator->errors(),
+        ], 422);
+    }
+
+    $user->name = $request->name;
+
+    if (method_exists($user, 'save')) {
+        $user->save();
+    } else {
+        return response()->json(['message' => 'No se pudo actualizar el nombre.'], 500);
+    }
+
+    return response()->json([
+        'message' => 'Nombre actualizado correctamente.',
+        'user' => [
+            'id' => $user->id,
+            'name' => $user->name,
+        ],
+    ], 200);
+}
+
+public function updateUserDescription(Request $request)
+{
+    $user = Auth::user();
+    if ($user && !$user instanceof \App\Models\User) {
+        $user = \App\Models\User::find($user->id);
+    }
+
+    $validator = Validator::make($request->all(), [
+        'userDescription' => 'required|string|max:255',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'Descripción inválida.',
+            'errors' => $validator->errors(),
+        ], 422);
+    }
+
+    $user->userDescription = $request->userDescription;
+
+    if (method_exists($user, 'save')) {
+        $user->save();
+    } else {
+        return response()->json(['message' => 'No se pudo actualizar la descripción.'], 500);
+    }
+
+    return response()->json([
+        'message' => 'Descripción actualizada correctamente.',
+        'user' => [
+            'id' => $user->id,
+            'userDescription' => $user->userDescription,
+        ],
+    ], 200);
+}
+
+public function updateJobDescription(Request $request)
+{
+    $user = Auth::user();
+    if ($user && !$user instanceof \App\Models\User) {
+        $user = \App\Models\User::find($user->id);
+    }
+
+    $validator = Validator::make($request->all(), [
+        'job_description' => 'required|string',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'Descripción de trabajo inválida.',
+            'errors' => $validator->errors(),
+        ], 422);
+    }
+
+    $user->job_description = $request->job_description;
+
+    if (method_exists($user, 'save')) {
+        $user->save();
+    } else {
+        return response()->json(['message' => 'No se pudo actualizar la descripción de trabajo.'], 500);
+    }
+
+    return response()->json([
+        'message' => 'Descripción de trabajo actualizada correctamente.',
+        'user' => [
+            'id' => $user->id,
+            'job_description' => $user->job_description,
+        ],
+    ], 200);
+}
 
 }
