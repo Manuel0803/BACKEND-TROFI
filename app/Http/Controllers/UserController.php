@@ -91,37 +91,37 @@ class UserController extends Controller
    public function uploadJobPhoto(Request $request)
 {
     $user = Auth::user();
-    if ($user && !$user instanceof \App\Models\User) {
-        $user = \App\Models\User::find($user->id);
-    }
 
-    // Validar que recibimos la URL de la imagen (string)
-    $validator = Validator::make($request->all(), [
-        'photoUrl' => 'required|string',
+    $request->validate([
+        'photoUrl' => 'required|string'
     ]);
 
-    if ($validator->fails()) {
-        return response()->json([
-            'message' => 'Datos inválidos',
-            'errors' => $validator->errors(),
-        ], 422);
-    }
-
+    // Decodificar si llega como string
     $images = $user->job_images ?? [];
 
-    // Simular un ID único para la nueva imagen
-    $nextId = count($images) > 0
-        ? max(array_column($images, 'id')) + 1
-        : 1;
+    if (is_string($images)) {
+        $images = json_decode($images, true);
+    }
 
-    $newImage = [
+    // Asegurar array de objetos
+    $images = is_array($images) ? $images : [];
+
+    // Obtener el ID más alto
+    $maxId = count($images) > 0 ? max(array_column($images, 'id')) : 0;
+    $nextId = $maxId + 1;
+
+    // Agregar nueva imagen
+    $images[] = [
         'id' => $nextId,
         'url' => $request->photoUrl,
     ];
 
-    $images[] = $newImage;
-
     $user->job_images = $images;
+
+    // Ensure $user is an Eloquent model instance before saving
+    if ($user && !$user instanceof \App\Models\User) {
+        $user = \App\Models\User::find($user->id);
+    }
 
     if (method_exists($user, 'save')) {
         $user->save();
@@ -131,27 +131,34 @@ class UserController extends Controller
         ], 500);
     }
 
-    return response()->json([
-        'message' => 'Imagen agregada correctamente',
-        'image' => $newImage
-    ], 200);
+    return response()->json(['id' => $nextId, 'url' => $request->photoUrl], 201);
 }
+
 
 
 public function deleteJobPhoto($id)
 {
     $user = Auth::user();
-    if ($user && !$user instanceof \App\Models\User) {
-        $user = \App\Models\User::find($user->id);
-    }
 
     $images = $user->job_images ?? [];
 
-    $updated = array_filter($images, function ($img) use ($id) {
-        return $img['id'] != $id;
+    if (is_string($images)) {
+        $images = json_decode($images, true);
+    }
+
+    $images = array_filter($images, function ($image) use ($id) {
+        return $image['id'] != $id;
     });
 
-    $user->job_images = array_values($updated);
+    // Reindexar el array (opcional)
+    $images = array_values($images);
+
+    $user->job_images = $images;
+
+    // Ensure $user is an Eloquent model instance before saving
+    if ($user && !$user instanceof \App\Models\User) {
+        $user = \App\Models\User::find($user->id);
+    }
 
     if (method_exists($user, 'save')) {
         $user->save();
@@ -163,6 +170,7 @@ public function deleteJobPhoto($id)
 
     return response()->json(['message' => 'Imagen eliminada']);
 }
+
 
 
 public function updateProfilePic(Request $request)
