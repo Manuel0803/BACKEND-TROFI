@@ -17,7 +17,12 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'sendPasswordResetEmail']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::get('/user/profile/{email}', [UserController::class, 'getUserProfile']);
+Route::get('/user/profile-by-id/{id}', [UserController::class, 'getUserProfileById']);
+Route::get('/user/photos/{id}', [UserController::class, 'getUserPhotos']);
+
 Route::get('/workers', [UserController::class, 'getAllWorkers']);
+Route::get('/workers/search', [UserController::class, 'searchWorkers']);
+
 Route::put('/user/update-name', [UserController::class, 'updateName']);
 Route::put('/user/update-userDescription', [UserController::class, 'updateUserDescription']);
 Route::put('/user/update-job_description', [UserController::class, 'updateJobDescription']);

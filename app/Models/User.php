@@ -11,7 +11,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    public function trabajo()
+    public function job()
     
     {
         return $this->belongsTo(Trabajo::class, 'id_job');
