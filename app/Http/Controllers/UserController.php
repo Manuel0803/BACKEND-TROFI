@@ -327,17 +327,21 @@ class UserController extends Controller
             return response()->json(['message' => 'Usuario no encontrado'], 404);
         }
 
+        // Calcular promedio de reseñas recibidas
+        $avgScore = $user->reviewsReceived()->avg('score');
+
         return response()->json([
             'id' => $user->id,
             'fullname' => $user->name,
             'location' => $user->location,
-            'score' => $user->score,
+            'score' => round($avgScore ?? 0, 1),
             'jobDescription' => $user->job_description,
             'userDescription' => $user->userDescription,
             'imageProfile' => $user->imageProfile,
             'jobCategory' => $user->job?->name,
         ]);
     }
+
 
     public function getUserPhotos($id)
     {
