@@ -15,7 +15,7 @@ class ReviewController extends Controller
         $request->validate([
             'reviewed_id' => 'required|exists:users,id',
             'description' => 'required|string',
-            'score' => 'required|integer|min:1|max:5',
+            'score' => 'required|numeric|min:1|max:5',
         ]);
 
         $review = Review::create([
@@ -40,7 +40,8 @@ class ReviewController extends Controller
             return response()->json(['message' => 'Usuario no encontrado'], 404);
         }
 
-        $reviews = $user->reviewsReceived()->with('reviewer:id,name,email')->get();
+        $reviews = $user->reviewsReceived()->with('reviewer:id,name,email,imageProfile')->get();
+
 
         return response()->json([
             'user_id' => $user->id,
