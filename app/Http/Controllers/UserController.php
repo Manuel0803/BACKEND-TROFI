@@ -470,6 +470,38 @@ class UserController extends Controller
         ], 200);
     }
 
+    //metodo para actualizar el oficio del usuario
+    public function updateJob(Request $request)
+{
+    $user = Auth::user();
+    if ($user && !$user instanceof \App\Models\User) {
+        $user = \App\Models\User::find($user->id);
+    }
+
+    $validator = Validator::make($request->all(), [
+        'id_job' => 'required|exists:trabajo,id',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'ID de trabajo inválido.',
+            'errors' => $validator->errors(),
+        ], 422);
+    }
+
+    $user->id_job = $request->id_job;
+    $user->save();
+
+    return response()->json([
+        'message' => 'Oficio actualizado correctamente.',
+        'user' => [
+            'id' => $user->id,
+            'id_job' => $user->id_job,
+        ],
+    ], 200);
+}
+
+
     //metodo para actualizar ubicación
     public function updateLocation(Request $request)
 {
