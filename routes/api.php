@@ -42,6 +42,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/user/update-job_description', [UserController::class, 'updateJobDescription']);
     Route::put('/user/update-location', [UserController::class, 'updateLocation']);
     Route::put('/user/update-phone', [UserController::class, 'updatePhoneNumber']);
+    Route::put('/user/update-job', [UserController::class, 'updateJob']);
 
     // Fotos de trabajo
     Route::post('/user/photos', [UserController::class, 'uploadJobPhoto']);
