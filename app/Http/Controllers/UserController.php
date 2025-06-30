@@ -469,4 +469,78 @@ class UserController extends Controller
             ],
         ], 200);
     }
+
+    //metodo para actualizar ubicación
+    public function updateLocation(Request $request)
+{
+    $user = Auth::user();
+    if ($user && !$user instanceof \App\Models\User) {
+        $user = \App\Models\User::find($user->id);
+    }
+
+    $validator = Validator::make($request->all(), [
+        'location' => 'required|string|max:255',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'Ubicación inválida.',
+            'errors' => $validator->errors(),
+        ], 422);
+    }
+
+    $user->location = $request->location;
+
+    if (method_exists($user, 'save')) {
+        $user->save();
+    } else {
+        return response()->json(['message' => 'No se pudo actualizar la ubicación.'], 500);
+    }
+
+    return response()->json([
+        'message' => 'Ubicación actualizada correctamente.',
+        'user' => [
+            'id' => $user->id,
+            'location' => $user->location,
+        ],
+    ], 200);
+}
+
+//metodo para actualizar numero telefonico
+    public function updatePhoneNumber(Request $request)
+{
+    $user = Auth::user();
+    if ($user && !$user instanceof \App\Models\User) {
+        $user = \App\Models\User::find($user->id);
+    }
+
+    $validator = Validator::make($request->all(), [
+        'phoneNumber' => 'required|string|max:20',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'Número de teléfono inválido.',
+            'errors' => $validator->errors(),
+        ], 422);
+    }
+
+    $user->phoneNumber = $request->phoneNumber;
+
+    if (method_exists($user, 'save')) {
+        $user->save();
+    } else {
+        return response()->json(['message' => 'No se pudo actualizar el número.'], 500);
+    }
+
+    return response()->json([
+        'message' => 'Número de teléfono actualizado correctamente.',
+        'user' => [
+            'id' => $user->id,
+            'phoneNumber' => $user->phoneNumber,
+        ],
+    ], 200);
+}
+
+
 }
