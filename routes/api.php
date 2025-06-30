@@ -11,6 +11,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Públicas
 Route::get('/jobs', [JobsController::class, 'index']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -23,20 +24,26 @@ Route::get('/user/photos/{id}', [UserController::class, 'getUserPhotos']);
 Route::get('/workers', [UserController::class, 'getAllWorkers']);
 Route::get('/workers/search', [UserController::class, 'searchWorkers']);
 
-Route::put('/user/update-name', [UserController::class, 'updateName']);
-Route::put('/user/update-userDescription', [UserController::class, 'updateUserDescription']);
-Route::put('/user/update-job_description', [UserController::class, 'updateJobDescription']);
-
-Route::middleware('auth:sanctum')->post('/reviews', [ReviewController::class, 'createReview']);
-Route::get('/user-reviews/{userId}', [ReviewController::class, 'getReviewsByUser']);
-
-Route::middleware('auth:sanctum')->post('/user/profile', [UserController::class, 'updateProfile']);
-Route::middleware('auth:sanctum')->put('/user/profile-image', [UserController::class, 'updateProfilePic']);
-Route::middleware('auth:sanctum')->put('/user/workerProfile', [UserController::class, 'updateProfileWorker']);
-
-
-Route::middleware(['auth:sanctum'])->group(function (){
+// Endpoints de actualización agrupados por autenticación
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/logout', [AuthController::class, 'logout']);
+
+    // Reseñas
+    Route::post('/reviews', [ReviewController::class, 'createReview']);
+
+    // Perfil de usuario
+    Route::post('/user/profile', [UserController::class, 'updateProfile']);
+    Route::put('/user/profile-image', [UserController::class, 'updateProfilePic']);
+    Route::put('/user/workerProfile', [UserController::class, 'updateProfileWorker']);
+
+    // Edición de campos individuales
+    Route::put('/user/update-name', [UserController::class, 'updateName']);
+    Route::put('/user/update-userDescription', [UserController::class, 'updateUserDescription']);
+    Route::put('/user/update-job_description', [UserController::class, 'updateJobDescription']);
+    Route::put('/user/update-location', [UserController::class, 'updateLocation']);
+    Route::put('/user/update-phone', [UserController::class, 'updatePhoneNumber']);
+
+    // Fotos de trabajo
     Route::post('/user/photos', [UserController::class, 'uploadJobPhoto']);
     Route::delete('/user/photos/{id}', [UserController::class, 'deleteJobPhoto']);
 });
