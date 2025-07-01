@@ -20,6 +20,7 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::get('/user/profile/{email}', [UserController::class, 'getUserProfile']);
 Route::get('/user/profile-by-id/{id}', [UserController::class, 'getUserProfileById']);
 Route::get('/user/photos/{id}', [UserController::class, 'getUserPhotos']);
+Route::get('/user-reviews/{userId}', [ReviewController::class, 'getReviewsByUser']);
 
 Route::get('/workers', [UserController::class, 'getAllWorkers']);
 Route::get('/workers/search', [UserController::class, 'searchWorkers']);
